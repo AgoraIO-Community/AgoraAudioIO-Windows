@@ -16,7 +16,7 @@ CExtendVideoFrameObserver::~CExtendVideoFrameObserver()
 bool CExtendVideoFrameObserver::onCaptureVideoFrame(VideoFrame& videoFrame)
 {
 	SIZE_T nBufferSize = 0x800000;
-
+	
 	BOOL bSuccess = CVideoPackageQueue::GetInstance()->PopVideoPackage(m_lpImageBuffer, &nBufferSize);
 	if (!bSuccess)
 		return false;

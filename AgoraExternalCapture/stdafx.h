@@ -44,6 +44,7 @@
 #include "AGEventDef.h"
 #include <afxdisp.h>
 #include <afxdisp.h>
+using namespace agora::util;
 
 #pragma comment(lib,"../SDK/lib/agora_rtc_sdk.lib")
 

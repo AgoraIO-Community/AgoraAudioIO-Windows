@@ -557,9 +557,14 @@ BOOL CAgoraObject::SetVideoProfileEx(int nWidth, int nHeight, int nFrameRate, in
 
 BOOL CAgoraObject::SetAudioProfileEx(int nSampleRate, int nChannels, int nSamplesPerCall)
 {
+	AParameter apm(*m_lpAgoraEngine);
+	apm->setParameters(R"(["che.audio.external_device":true])");
+
 	RtcEngineParameters rep(*m_lpAgoraEngine);
 
 	int nRet = rep.setRecordingAudioFrameParameters(nSampleRate, nChannels, RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, nSamplesPerCall);
+	nRet = rep.setPlaybackAudioFrameParameters(nSampleRate, nChannels, RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, nSamplesPerCall);
+	nRet = rep.setAudioProfile(AUDIO_PROFILE_MUSIC_STANDARD_STEREO, AUDIO_SCENARIO_SHOWROOM);
 
 	return nRet == 0 ? TRUE : FALSE;
 }

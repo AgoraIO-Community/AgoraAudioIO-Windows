@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ExtendVideoFrameObserver.h"
+#include <iostream>
 
 
 CExtendVideoFrameObserver::CExtendVideoFrameObserver()
@@ -17,6 +18,15 @@ bool CExtendVideoFrameObserver::onCaptureVideoFrame(VideoFrame& videoFrame)
 {
 	SIZE_T nBufferSize = 0x800000;
 	
+	FILE* pFileRecord = fopen("..\\Extendaudio.txt", "ab+");
+	if (pFileRecord) {
+
+		std::string str = __FUNCTION__ + std::string("\n");
+		fwrite(str.data(), 1, str.length(), pFileRecord);
+		fclose(pFileRecord);
+		pFileRecord = nullptr;
+	}
+
 	BOOL bSuccess = CVideoPackageQueue::GetInstance()->PopVideoPackage(m_lpImageBuffer, &nBufferSize);
 	if (!bSuccess)
 		return false;

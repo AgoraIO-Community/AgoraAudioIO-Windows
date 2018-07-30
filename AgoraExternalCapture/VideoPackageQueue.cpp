@@ -39,7 +39,7 @@ void CVideoPackageQueue::SetVideoFormat(const BITMAPINFOHEADER *lpInfoHeader)
 {
 	memcpy_s(&m_bmiHeader, sizeof(BITMAPINFOHEADER), lpInfoHeader, sizeof(BITMAPINFOHEADER));
 
-	m_nPackageSize = m_bmiHeader.biWidth*m_bmiHeader.biWidth * 3 / 2;
+	m_nPackageSize = m_bmiHeader.biWidth*m_bmiHeader.biHeight * 3 / 2;
 	_ASSERT(m_nPackageSize <= m_nBufferSize);
 }
 

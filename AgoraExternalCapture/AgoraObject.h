@@ -24,7 +24,7 @@ using namespace agora::media;
 #define AG_ENGFLAG_NSON			0x00000200	// ½µÔë
 #define AG_ENGFLAG_AECON		0x00000400	// »ØÉùÏû³ý
 
-#define APP_ID				_T("0c0b4b61adf94de1befd7cdd78a50444")
+#define APP_ID				_T("aab8b8f5a8cd4469a63042fcfafe7063")
 
 typedef struct _SEI_INFO
 {
@@ -79,7 +79,7 @@ public:
 	BOOL EnableVideo(BOOL bEnable = TRUE);
 	BOOL IsVideoEnabled();
 
-	BOOL EnableScreenCapture(HWND hWnd, int nCapFPS = 15, LPCRECT lpCapRect = NULL, BOOL bEnable = TRUE, int nBitrate = 0);
+	BOOL EnableScreenCapture(HWND hWnd, int nCapFPS = 15, LPCRECT lpCapRect = NULL, BOOL bEnable = TRUE);
 	BOOL IsScreenCaptureEnabled();
 
 	BOOL MuteLocalAudio(BOOL bMuted = TRUE);
@@ -121,6 +121,9 @@ public:
 	BOOL SetExternalAudioSource(BOOL bEnabled, int nSampleRate, int nChannels);
 	BOOL EnableExtendAudioCapture(BOOL bEnable, IAudioFrameObserver* lpAudioFrameObserver);
 	BOOL EnableExtendVideoCapture(BOOL bEnable, IVideoFrameObserver* lpVideoFrameObserver);
+	BOOL EnableSDKVideoCapture(BOOL bEnable);
+
+	BOOL PushVideoFrame(agora::media::IVideoFrameObserver::VideoFrame *videoFrame);
 
 	BOOL LocalVideoPreview(HWND hVideoWnd, BOOL bPreviewOn = TRUE);
 

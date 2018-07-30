@@ -24,6 +24,16 @@ typedef struct _PUSHAUDIO_THREAD_PARAM
 
 } PUSHAUDIODATA_THREAD_PARAM, *PPUSHAUDIODATA_THREAD_PARAM, *LPPUSHAUDIODATA_THREAD_PARAM;
 
+typedef struct _PUSHVIDEO_THREAD_PARAM
+{
+	HANDLE hExitEvent;
+	int nHeight;
+	int nWidth;
+	int nFps;
+	int nRotate;
+
+}PUSHVIDEODATA_THREAD_PARAM, *PPUSHVIDEODATA_THREAD_PARAM, *LPPUSHVIDEODATA_THREAD_PARAM;
+
 typedef struct _PLAYOUT_THREAD_PARAM
 {
 	HANDLE		hExitEvent;
@@ -93,6 +103,7 @@ private:
 	CButton			m_ckExtVideoCapture;
 	CButton			m_ckExtAudioCapture;
 	CButton			m_ckExtPushAudio;
+	CButton        m_ckExtPushVideo;
 
 	CFont			m_ftDes;
 	CFont			m_ftHead;
@@ -116,8 +127,12 @@ private:
 
 	HANDLE						m_hExitPushAudioEvent;
 	PUSHAUDIODATA_THREAD_PARAM	m_pushAudioThreadParam;
+	
+	HANDLE                      m_hExitPushVideoEvent;
+	PUSHVIDEODATA_THREAD_PARAM  m_pushVideoThreadParam;
 
 private:
 	static UINT PlayoutThread(LPVOID lParam);
 	static UINT PushAudioDataThread(LPVOID lParam);
+	static UINT PushVideoDataThread(LPVOID lParam);
 };

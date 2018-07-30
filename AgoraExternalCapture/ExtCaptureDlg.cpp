@@ -37,6 +37,7 @@ void CExtCaptureDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CKAUDIOCAP_EXTCAP, m_ckExtAudioCapture);
 
 	DDX_Control(pDX, IDC_CKAUDIOPUSH_EXTCAP, m_ckExtPushAudio);
+	DDX_Control(pDX, IDC_CKVIDEOPUSH_EXCAPTURE, m_ckExtPushVideo);
 }
 
 
@@ -112,6 +113,7 @@ void CExtCaptureDlg::InitCtrls()
 	m_cmbCamCap.SetFaceColor(RGB(0xFF, 0xFF, 0xFF), RGB(0xFF, 0xFF, 0xFF));
 
 	m_ckExtVideoCapture.MoveWindow(100, 105, 200, 24);
+	m_ckExtPushVideo.MoveWindow(100, 137, 200,24);
 
 	m_cmbMicrophone.MoveWindow(70, 180, 170, 22, TRUE);
 	m_cmbMicrophone.SetFont(&m_ftHead);
@@ -196,6 +198,9 @@ void CExtCaptureDlg::OnBnClickedBtnconfirmExtcap()
 		CVideoPackageQueue::GetInstance()->SetVideoFormat(&videoInfo.bmiHeader);
 
 		lpAgoraObject->SetVideoProfileEx(videoInfo.bmiHeader.biWidth, videoInfo.bmiHeader.biHeight, static_cast<int>(10000000 / videoInfo.AvgTimePerFrame), 1000);
+
+		if (!m_ckExtPushVideo.GetCheck())
+			lpAgoraObject->EnableExtendVideoCapture(TRUE, &m_exCapVideoFrameObserver);
 	}
 
 	if (m_ckExtAudioCapture.GetCheck()) {
@@ -250,9 +255,12 @@ void CExtCaptureDlg::OnBnClickedBtnapplyExtcap()
 		m_agVideoCaptureDevice.SetCaptureBuffer(videoInfo.bmiHeader.biSizeImage, 30, 4);
 		m_agVideoCaptureDevice.SetGrabberCallback(&m_agVideoCapture, 1);
 		CVideoPackageQueue::GetInstance()->SetVideoFormat(&videoInfo.bmiHeader);
+		m_pushVideoThreadParam.nWidth = videoInfo.bmiHeader.biWidth;
+		m_pushVideoThreadParam.nHeight = videoInfo.bmiHeader.biHeight;
+		m_pushVideoThreadParam.nFps = 15;
+		m_pushVideoThreadParam.nRotate = 0;
 
 		lpAgoraObject->SetVideoProfileEx(videoInfo.bmiHeader.biWidth, videoInfo.bmiHeader.biHeight, static_cast<int>(10000000 / videoInfo.AvgTimePerFrame), 1000);
-
 	}
 
 	if (m_ckExtAudioCapture.GetCheck()) {
@@ -435,8 +443,19 @@ BOOL CExtCaptureDlg::VideoCaptureControl(BOOL bStart)
 	if (!m_ckExtVideoCapture.GetCheck())
 		return TRUE;
 
+	CAgoraObject *lpAgoraObject = CAgoraObject::GetAgoraObject();
+	BOOL bPushMode = m_ckExtVideoCapture.GetCheck();
+
 	if (bStart) {
-		CAgoraObject::GetAgoraObject()->EnableExtendVideoCapture(TRUE, &m_exCapVideoFrameObserver);
+		if (bPushMode) {
+			lpAgoraObject->EnableSDKVideoCapture(FALSE);
+			m_pushVideoThreadParam.hExitEvent = m_hExitPushVideoEvent;
+			AfxBeginThread(&CExtCaptureDlg::PushVideoDataThread, &m_pushVideoThreadParam);
+		}
+		else {
+			lpAgoraObject->EnableExtendVideoCapture(TRUE, &m_exCapVideoFrameObserver);
+		}
+
 		return m_agVideoCaptureDevice.CaptureControl(DEVICE_START);
 	}
 	else {
@@ -533,7 +552,7 @@ UINT CExtCaptureDlg::PushAudioDataThread(LPVOID lParam)
 	CAudioCapturePackageQueue *lpBufferQueue = CAudioCapturePackageQueue::GetInstance();
 
 	agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
-	mediaEngine.queryInterface(CAgoraObject::GetEngine(), agora::AGORA_IID_MEDIA_ENGINE);
+	mediaEngine.queryInterface(CAgoraObject::GetEngine(), agora::rtc::AGORA_IID_MEDIA_ENGINE);
 	IAudioFrameObserver::AudioFrame frame;
 
 	lpBufferQueue->GetAudioFormat(&waveFormatEx);
@@ -560,6 +579,61 @@ UINT CExtCaptureDlg::PushAudioDataThread(LPVOID lParam)
 	} while (TRUE);
 
 	delete[] lpAudioData;
+
+	return 0;
+}
+
+UINT CExtCaptureDlg::PushVideoDataThread(LPVOID lParam)
+{
+	LPPUSHVIDEODATA_THREAD_PARAM lpParam = reinterpret_cast<LPPUSHVIDEODATA_THREAD_PARAM>(lParam);
+	CAgoraObject* lpAgoraObject = CAgoraObject::GetAgoraObject();
+	LPBYTE lpVideoData = new BYTE[0x800000];
+
+	IVideoFrameObserver::VideoFrame *lpFrame = new IVideoFrameObserver::VideoFrame;
+	int nWidth = lpParam->nWidth;
+	int nHeight = lpParam->nHeight;
+	int nYStride = nWidth / 2;
+	int nUStride = nWidth / 2;
+	int nVStride = nWidth / 2;
+
+	lpFrame->width = nWidth;
+	lpFrame->height = nHeight;
+	lpFrame->yStride = nYStride;
+	lpFrame->uStride = nUStride;
+	lpFrame->vStride = nVStride;
+
+	lpFrame->renderTimeMs = lpParam->nFps;
+	lpFrame->type = IVideoFrameObserver::FRAME_TYPE_YUV420;
+	lpFrame->rotation = 0;
+
+	do {
+		if (::WaitForSingleObject(lpParam->hExitEvent, 0) == WAIT_OBJECT_0)
+			break;
+
+		SIZE_T nVideoDataLen = nWidth *nHeight * 3 / 2;
+		BOOL bSuccess = CVideoPackageQueue::GetInstance()->PopVideoPackage(lpVideoData, &nVideoDataLen);
+		if (!bSuccess)
+			continue;
+
+#ifdef _DEBUG
+		FILE *pFile = fopen("../video.yuv", "ab+");
+		if (pFile) {
+			fwrite(lpVideoData, 1, nWidth * nHeight * 3 /2 , pFile);
+			fclose(pFile);
+			pFile = nullptr;
+		}
+#endif
+
+		lpFrame->yBuffer = lpVideoData;
+		lpFrame->uBuffer = lpVideoData + nYStride * nHeight;
+		lpFrame->vBuffer = lpVideoData + nYStride * nHeight + nUStride * nHeight / 2;
+
+		lpAgoraObject->PushVideoFrame(lpFrame);
+	
+	} while (TRUE);
+
+	delete[] lpVideoData;
+	lpVideoData = NULL;
 
 	return 0;
 }

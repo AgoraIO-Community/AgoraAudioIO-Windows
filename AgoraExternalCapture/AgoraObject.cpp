@@ -649,7 +649,7 @@ BOOL CAgoraObject::PushVideoFrame(agora::media::IVideoFrameObserver::VideoFrame 
 	if (mediaEngine.get() == NULL)
 		return FALSE;
 
-	mediaEngine->pushVideoFrame(videoFrame);
+	nRet = mediaEngine->pushVideoFrame(videoFrame);
 
 	return nRet == 0 ? TRUE : FALSE;
 }

@@ -589,22 +589,22 @@ UINT CExtCaptureDlg::PushVideoDataThread(LPVOID lParam)
 	CAgoraObject* lpAgoraObject = CAgoraObject::GetAgoraObject();
 	LPBYTE lpVideoData = new BYTE[0x800000];
 
-	IVideoFrameObserver::VideoFrame *lpFrame = new IVideoFrameObserver::VideoFrame;
+	IVideoFrameObserver::VideoFrame frame;
 	int nWidth = lpParam->nWidth;
 	int nHeight = lpParam->nHeight;
-	int nYStride = nWidth / 2;
+	int nYStride = nWidth;
 	int nUStride = nWidth / 2;
 	int nVStride = nWidth / 2;
 
-	lpFrame->width = nWidth;
-	lpFrame->height = nHeight;
-	lpFrame->yStride = nYStride;
-	lpFrame->uStride = nUStride;
-	lpFrame->vStride = nVStride;
+	frame.width = nWidth;
+	frame.height = nHeight;
+	frame.yStride = nYStride;
+	frame.uStride = nUStride;
+	frame.vStride = nVStride;
 
-	lpFrame->renderTimeMs = lpParam->nFps;
-	lpFrame->type = IVideoFrameObserver::FRAME_TYPE_YUV420;
-	lpFrame->rotation = 0;
+	frame.renderTimeMs = ::GetTickCount64();
+	frame.type = IVideoFrameObserver::FRAME_TYPE_YUV420;
+	frame.rotation = 0;
 
 	do {
 		if (::WaitForSingleObject(lpParam->hExitEvent, 0) == WAIT_OBJECT_0)
@@ -615,20 +615,22 @@ UINT CExtCaptureDlg::PushVideoDataThread(LPVOID lParam)
 		if (!bSuccess)
 			continue;
 
+		frame.yBuffer = lpVideoData;
+		frame.uBuffer = lpVideoData + nYStride * nHeight;
+		frame.vBuffer = lpVideoData + nYStride * nHeight + nUStride * nHeight / 2;
+
 #ifdef _DEBUG
 		FILE *pFile = fopen("../video.yuv", "ab+");
 		if (pFile) {
-			fwrite(lpVideoData, 1, nWidth * nHeight * 3 /2 , pFile);
+			fwrite(frame.yBuffer, 1, nYStride * nHeight, pFile);
+			fwrite(frame.uBuffer, 1, nUStride* nHeight /2 , pFile);
+			fwrite(frame.vBuffer, 1, nVStride * nHeight / 2, pFile);
 			fclose(pFile);
 			pFile = nullptr;
 		}
 #endif
 
-		lpFrame->yBuffer = lpVideoData;
-		lpFrame->uBuffer = lpVideoData + nYStride * nHeight;
-		lpFrame->vBuffer = lpVideoData + nYStride * nHeight + nUStride * nHeight / 2;
-
-		lpAgoraObject->PushVideoFrame(lpFrame);
+		lpAgoraObject->PushVideoFrame(&frame);
 	
 	} while (TRUE);
 

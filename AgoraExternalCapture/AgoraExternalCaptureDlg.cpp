@@ -323,7 +323,8 @@ LRESULT CAgoraExternalCaptureDlg::OnJoinChannel(WPARAM wParam, LPARAM lParam)
 	vc.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
 
     m_nVideoSolution = m_dlgSetup.GetVideoSolution();
-    lpRtcEngine->setVideoProfile((VIDEO_PROFILE_TYPE)m_nVideoSolution, m_dlgSetup.IsWHSwap());
+	lpRtcEngine->setVideoProfile((VIDEO_PROFILE_TYPE)m_nVideoSolution, m_dlgSetup.IsWHSwap());
+//	lpAgoraObject->SetVideoProfileEx(640, 480, 30, 500);
     lpAgoraObject->EnableVideo(TRUE);
 
 	m_dlgVideo.SetWindowText(strChannelName);

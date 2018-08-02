@@ -35,6 +35,7 @@ CAgoraExternalCaptureApp::CAgoraExternalCaptureApp()
 // The one and only CAgoraVideoCallApp object
 
 CAgoraExternalCaptureApp theApp;
+bool isRenderSelf = false;
 
 
 // CAgoraVideoCallApp initialization

@@ -449,21 +449,25 @@ BOOL CExtCaptureDlg::VideoCaptureControl(BOOL bStart)
 		return TRUE;
 
 	CAgoraObject *lpAgoraObject = CAgoraObject::GetAgoraObject();
-	BOOL bPushMode = m_ckExtVideoCapture.GetCheck();
+	BOOL bExtendVideo = m_ckExtVideoCapture.GetCheck();
+	BOOL bVideoPushMode = m_ckExtPushVideo.GetCheck();
 
-	if (bStart) {
-		if (bPushMode) {
+	if (bStart && bExtendVideo) {
+		if (bVideoPushMode) {
+			isRenderSelf = false;
 			lpAgoraObject->EnableSDKVideoCapture(FALSE);
 			m_pushVideoThreadParam.hExitEvent = m_hExitPushVideoEvent;
 			AfxBeginThread(&CExtCaptureDlg::PushVideoDataThread, &m_pushVideoThreadParam);
 		}
 		else {
+			isRenderSelf = true;
 			lpAgoraObject->EnableExtendVideoCapture(TRUE, &m_exCapVideoFrameObserver);
 		}
 
 		return m_agVideoCaptureDevice.CaptureControl(DEVICE_START);
 	}
 	else {
+		isRenderSelf = false;
 		CAgoraObject::GetAgoraObject()->EnableExtendVideoCapture(FALSE, NULL);
 		return m_agVideoCaptureDevice.CaptureControl(DEVICE_STOP);
 		::SetEvent(m_hExitPushVideoEvent);
@@ -619,9 +623,6 @@ UINT CExtCaptureDlg::PushVideoDataThread(LPVOID lParam)
 			break;
 
 		int nVideoDataLen = nWidth *nHeight * 3 / 2;
-// 		BOOL bSuccess = CVideoPackageQueue::GetInstance()->PopVideoPackage(lpVideoData, &nVideoDataLen);
-// 		if (!bSuccess)
-// 			continue;
 		if (!lpBufferMgr->popYUVBuffer(0,lpVideoData,nVideoDataLen,nWidth,nHeight))
 			continue;
 
@@ -629,7 +630,7 @@ UINT CExtCaptureDlg::PushVideoDataThread(LPVOID lParam)
 		frame.uBuffer = lpVideoData + nYStride * nHeight;
 		frame.vBuffer = lpVideoData + nYStride * nHeight + nUStride * nHeight / 2;
 
-#ifdef _DEBUG
+#if 0
 		FILE *pFile = fopen("../video.yuv", "ab+");
 		if (pFile) {
 			fwrite(frame.yBuffer, 1, nYStride * nHeight, pFile);

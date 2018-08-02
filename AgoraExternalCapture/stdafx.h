@@ -46,6 +46,8 @@
 #include <afxdisp.h>
 using namespace agora::util;
 
+extern bool isRenderSelf;
+
 #pragma comment(lib,"../SDK/lib/agora_rtc_sdk.lib")
 
 

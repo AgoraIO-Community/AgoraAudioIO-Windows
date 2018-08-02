@@ -495,6 +495,102 @@ namespace AgoraSdkCWrapperUtilc
 #endif
 	}
 
+	static unsigned char CONVERT_ADJUST(double tmp)
+	{
+		return (unsigned char)((tmp >= 0 && tmp <= 255) ? tmp : (tmp < 0 ? 0 : 255));
+	}
+
+	static void CONVERT_YUV420PtoRGB24(unsigned char* yuv_src, unsigned char* rgb_dst, int nWidth, int nHeight)
+	{
+		unsigned char *tmpbuf = (unsigned char *)malloc(nWidth*nHeight * 3);
+		unsigned char Y, U, V, R, G, B;
+		unsigned char* y_planar, *u_planar, *v_planar;
+		int rgb_width, u_width;
+		rgb_width = nWidth * 3;
+		u_width = (nWidth >> 1);
+		int ypSize = nWidth * nHeight;
+		int upSize = (ypSize >> 2);
+		int offSet = 0;
+
+		y_planar = yuv_src;
+		u_planar = yuv_src + ypSize;
+		v_planar = u_planar + upSize;
+
+		for (int i = 0; i < nHeight; i++)
+		{
+			for (int j = 0; j < nWidth; j++)
+			{
+				// Get the Y value from the y planar
+				Y = *(y_planar + nWidth * i + j);
+				// Get the V value from the u planar
+				offSet = (i >> 1) * (u_width)+(j >> 1);
+				V = *(u_planar + offSet);
+				// Get the U value from the v planar
+				U = *(v_planar + offSet);
+
+				// Cacular the R,G,B values
+				// Method 1
+				R = CONVERT_ADJUST((Y + (1.4075 * (V - 128))));
+				G = CONVERT_ADJUST((Y - (0.3455 * (U - 128) - 0.7169 * (V - 128))));
+				B = CONVERT_ADJUST((Y + (1.7790 * (U - 128))));
+				/*
+				// The following formulas are from MicroSoft' MSDN
+				int C,D,E;
+				// Method 2
+				C = Y - 16;
+				D = U - 128;
+				E = V - 128;
+				R = CONVERT_ADJUST(( 298 * C + 409 * E + 128) >> 8);
+				G = CONVERT_ADJUST(( 298 * C - 100 * D - 208 * E + 128) >> 8);
+				B = CONVERT_ADJUST(( 298 * C + 516 * D + 128) >> 8);
+				R = ((R - 128) * .6 + 128 )>255?255:(R - 128) * .6 + 128;
+				G = ((G - 128) * .6 + 128 )>255?255:(G - 128) * .6 + 128;
+				B = ((B - 128) * .6 + 128 )>255?255:(B - 128) * .6 + 128;
+				*/
+
+				offSet = rgb_width * i + j * 3;
+
+				rgb_dst[offSet] = B;
+				rgb_dst[offSet + 1] = G;
+				rgb_dst[offSet + 2] = R;
+			}
+		}
+		free(tmpbuf);
+	}
+
+	//Not Efficient, Just an example
+	//change endian of a pixel (32bit)
+	static void CHANGE_ENDIAN_32(unsigned char *data){
+		char temp3, temp2;
+		temp3 = data[3];
+		temp2 = data[2];
+		data[3] = data[0];
+		data[2] = data[1];
+		data[0] = temp3;
+		data[1] = temp2;
+	}
+
+	static void CHANGE_ENDIAN_24(unsigned char *data){
+		char temp2 = data[2];
+		data[2] = data[0];
+		data[0] = temp2;
+	}
+
+	//Change endian of a picture
+	static void CHANGE_ENDIAN_PIC(unsigned char *image, int w, int h, int bpp){
+		unsigned char *pixeldata = NULL;
+		for (int i = 0; i < h; i++)
+			for (int j = 0; j < w; j++){
+				pixeldata = image + (i*w + j)*bpp / 8;
+				if (bpp == 32){
+					CHANGE_ENDIAN_32(pixeldata);
+				}
+				else if (bpp == 24){
+					CHANGE_ENDIAN_24(pixeldata);
+				}
+			}
+	}
+
 }
 
 

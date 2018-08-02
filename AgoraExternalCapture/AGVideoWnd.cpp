@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "AgoraExternalCapture.h"
 #include "AGVideoWnd.h"
+#include "CBufferMgr.h"
+#include "YUVTrans.h"
 
 IMPLEMENT_DYNAMIC(CAGInfoWnd, CWnd)
 
@@ -112,12 +114,13 @@ CAGVideoWnd::CAGVideoWnd()
 , m_bBigShow(FALSE)
 , m_bBackground(FALSE)
 {
-
+	m_hRenderGDIEvent = ::CreateEvent(NULL, NULL, FALSE, NULL);
 }
 
 CAGVideoWnd::~CAGVideoWnd()
 {
 	m_imgBackGround.DeleteImageList();
+	::CloseHandle(m_hRenderGDIEvent);
 }
 
 
@@ -262,6 +265,9 @@ int CAGVideoWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// TODO:  在此添加您专用的创建代码
 	m_wndInfo.Create(NULL, NULL, WS_CHILD | WS_VISIBLE, CRect(0, 0, 192, 28), this, IDC_STATIC);
+	
+	m_renderVideoThreadParam.hExitEvent = m_hRenderGDIEvent;
+	AfxBeginThread(RenderThreadGDI, this);
 
 	return 0;
 }
@@ -354,4 +360,130 @@ void CAGVideoWnd::OnPaint()
     }
     else
         return CWnd::OnPaint();
+}
+
+UINT CAGVideoWnd::RenderThreadGDI(LPVOID lParam)
+{
+	//LPRENDERVIDEO_THREAD_PARAM lpRenderVideoThreadParam = (LPRENDERVIDEO_THREAD_PARAM)lParam;
+	CAGVideoWnd* pVideoWnd = (CAGVideoWnd*)lParam;
+
+	CBufferMgr* lpBufferMgr = CBufferMgr::getInstance();
+	LPBYTE lpVideoData = new BYTE[0x800000];
+	int nWidth = 0;
+	int nHeight = 0;
+	LPBYTE lpVideoImage24 = nullptr;
+
+	do{
+		if (pVideoWnd->m_nUID == 0 || 0 == pVideoWnd->m_nWidth || 0 == pVideoWnd->m_nHeight)
+			continue;
+		else if ( nullptr == lpVideoImage24)
+			lpVideoImage24 = new BYTE[pVideoWnd->m_nWidth * pVideoWnd->m_nHeight * 3];
+
+		if (::WaitForSingleObject(pVideoWnd->m_hRenderGDIEvent, 0) == WAIT_OBJECT_0)
+			break;
+	
+		int nVideoDataLen = pVideoWnd->m_nWidth * pVideoWnd->m_nHeight  * 3 / 2;
+		if (!lpBufferMgr->popYUVBuffer(pVideoWnd->m_nUID,lpVideoData,nVideoDataLen,nWidth,nHeight))
+			continue;
+	
+		int nRGB24Len = nWidth * nHeight * 3;
+		CONVERT_YUV420PtoRGB24(lpVideoData, lpVideoImage24, nWidth, nHeight);
+		//Change to Little Endian
+		CHANGE_ENDIAN_PIC(lpVideoImage24, nWidth, nHeight, 24);
+
+		FILE *pFile1 = fopen("../rgb24.h264", "ab+");
+		if (pFile1) {
+			fwrite(lpVideoImage24, 1, nRGB24Len, pFile1);
+			fclose(pFile1);
+		}
+
+		BITMAPINFO m_bmphdr={0};
+		DWORD dwBmpHdr = sizeof(BITMAPINFO);
+		//24bit
+		m_bmphdr.bmiHeader.biBitCount = 24;
+		m_bmphdr.bmiHeader.biClrImportant = 0;
+		m_bmphdr.bmiHeader.biSize = dwBmpHdr;
+		m_bmphdr.bmiHeader.biSizeImage = 0;
+		m_bmphdr.bmiHeader.biWidth = nWidth;
+		//Notice: BMP storage pixel data in opposite direction of Y-axis (from bottom to top).
+		//So we must set reverse biHeight to show image correctly.
+		m_bmphdr.bmiHeader.biHeight = nHeight;
+		m_bmphdr.bmiHeader.biXPelsPerMeter = 0;
+		m_bmphdr.bmiHeader.biYPelsPerMeter = 0;
+		m_bmphdr.bmiHeader.biClrUsed = 0;
+		m_bmphdr.bmiHeader.biPlanes = 1;
+		m_bmphdr.bmiHeader.biCompression = BI_RGB;
+		
+		HWND wnd = pVideoWnd->m_hWnd;
+		HDC hdc = ::GetWindowDC(wnd);
+		CRect rt;
+		pVideoWnd->GetClientRect(&rt);
+		pVideoWnd->ClientToScreen(&rt);
+		int nScreenX = rt.right - rt.left;
+		int nScreenY = rt.bottom - rt.top;
+		
+		double d1 = nScreenX * 1.0 / nScreenY;
+		double d2 = nWidth * 1.0 / nHeight;
+		
+		int nDcX = 0; int nDcY = 0; int nDcWdith = 0; int nDcHeight = 0;
+		if (1 <= d2) {//x > y
+			
+			if (d1 >= d2) {
+				nDcHeight = nScreenY;
+				nDcY = 0;
+				nDcWdith = d2 * nDcHeight;
+				nDcX = (nScreenX - nDcWdith) / 2;
+			}
+			else {
+
+				nDcWdith = nScreenX;
+				nDcX = 0;
+				nDcHeight = d1 * nDcWdith;
+				nDcY = (nScreenY - nDcHeight) / 2;
+			}
+		}
+		else {//x < y
+			
+			if (nScreenY >= nHeight) {
+
+			}
+			else if (nScreenY < nHeight) {
+				nDcHeight = nScreenY;
+				nDcWdith = d2 * nDcHeight;
+				nDcY = 0;
+				nDcX = (nScreenX - nDcWdith) / 2;
+			}
+		}
+
+
+		int nResult = StretchDIBits(hdc,
+			nDcX,nDcY,
+			nDcWdith,nDcHeight,
+			0, 0,
+			nWidth, nHeight,
+			lpVideoImage24,
+			&m_bmphdr,
+			DIB_RGB_COLORS,
+			SRCCOPY);
+
+		::ReleaseDC(wnd, hdc);
+
+		
+#if 0
+		FILE *pFile = fopen("../video.yuv", "ab+");
+		if (pFile) {
+			fwrite(lpVideoData, 1, nVideoDataLen, pFile);
+			fclose(pFile);
+			pFile = nullptr;
+		}
+#endif
+
+	} while (TRUE);
+
+	if (lpVideoData)
+		delete[] lpVideoData;
+	if (lpVideoImage24)
+		delete[] lpVideoImage24;
+	
+	return TRUE;
 }

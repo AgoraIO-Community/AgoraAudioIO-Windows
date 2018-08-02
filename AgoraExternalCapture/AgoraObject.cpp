@@ -724,6 +724,7 @@ BOOL CAgoraObject::SetEncryptionSecret(LPCTSTR lpKey, int nEncryptType)
 
 BOOL CAgoraObject::EnableLocalRender(BOOL bEnable)
 {
+	return 1;
 	int nRet = 0;
 
 	AParameter apm(*m_lpAgoraEngine);

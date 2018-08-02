@@ -2,6 +2,7 @@
 
 #define WM_SHOWMODECHANGED	WM_USER+300
 #define WM_SHOWBIG			WM_USER+301
+#include "ExtCaptureDlg.h"
 
 class CAGInfoWnd : public CWnd
 {
@@ -97,8 +98,13 @@ private:
 	BOOL		m_bBigShow;
 
     BOOL        m_bBackground;
+
+	HANDLE m_hRenderGDIEvent;
+	RENDERVIDEO_THREAD_PARAM m_renderVideoThreadParam;
+
 public:
     afx_msg void OnPaint();
+	static UINT RenderThreadGDI(LPVOID lParam);
 };
 
 

@@ -1100,7 +1100,8 @@ void CVideoDlg::RebindVideoWnd()
 			canvas.view = m_wndVideo[nIndex].GetSafeHwnd();
 			agvWndInfo.nIndex = nIndex;
 
-			CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
+			if (!isRenderSelf)
+				CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
 			m_wndVideo[nIndex].SetUID(canvas.uid);
 			m_wndVideo[nIndex].SetVideoResolution(agvWndInfo.nWidth, agvWndInfo.nHeight);
 			m_wndVideo[nIndex].SetFrameRateInfo(agvWndInfo.nFramerate);

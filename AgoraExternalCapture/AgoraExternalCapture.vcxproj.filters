@@ -199,6 +199,12 @@
     <ClInclude Include="AgoraExternalCaptureDlg.h">
       <Filter>App</Filter>
     </ClInclude>
+    <ClInclude Include="CBufferMgr.h">
+      <Filter>ExtCapture\BufferQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="AgoraUtilc.h">
+      <Filter>ExtCapture\BufferQueue</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -329,6 +335,9 @@
     </ClCompile>
     <ClCompile Include="AgoraExternalCaptureDlg.cpp">
       <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="CBufferMgr.cpp">
+      <Filter>ExtCapture\BufferQueue</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -129,10 +129,12 @@
     <ClInclude Include="AgoraExternalCaptureDlg.h" />
     <ClInclude Include="AgoraPlayoutManager.h" />
     <ClInclude Include="AgoraObject.h" />
+    <ClInclude Include="AgoraUtilc.h" />
     <ClInclude Include="AGVideoCapture.h" />
     <ClInclude Include="AudioCapturePackageQueue.h" />
     <ClInclude Include="AudioPlayPackageQueue.h" />
     <ClInclude Include="BufferQueue.h" />
+    <ClInclude Include="CBufferMgr.h" />
     <ClInclude Include="DShowPinHelper.h" />
     <ClInclude Include="DskcapsetDlg.h" />
     <ClInclude Include="ExtCaptureDlg.h" />
@@ -182,6 +184,7 @@
     <ClCompile Include="AudioCapturePackageQueue.cpp" />
     <ClCompile Include="AudioPlayPackageQueue.cpp" />
     <ClCompile Include="BufferQueue.cpp" />
+    <ClCompile Include="CBufferMgr.cpp" />
     <ClCompile Include="DShowPinHelper.cpp" />
     <ClCompile Include="DskcapsetDlg.cpp" />
     <ClCompile Include="ExtCaptureDlg.cpp" />

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "AGVideoCapture.h"
 #include "VideoPackageQueue.h"
+#include "CBufferMgr.h"
 
 #include "libYUV/libyuv.h"
 
@@ -60,6 +61,7 @@ STDMETHODIMP CAGVideoCapture::SampleCB(double SampleTime, IMediaSample* pSample)
 STDMETHODIMP CAGVideoCapture::BufferCB(double dblSampleTime, BYTE *pBuffer, long lBufferSize)
 {
 	CVideoPackageQueue *lpPackageQueue = CVideoPackageQueue::GetInstance();
+	CBufferMgr* lpBufferInstance = CBufferMgr::getInstance();
 	BITMAPINFOHEADER bmiHeader;
 
 	if (lpPackageQueue->GetBufferSize() < static_cast<SIZE_T>(lBufferSize))
@@ -142,7 +144,9 @@ STDMETHODIMP CAGVideoCapture::BufferCB(double dblSampleTime, BYTE *pBuffer, long
 		break;
 	}
 
-	lpPackageQueue->PushVideoPackage(m_lpYUVBuffer, nYUVSize);
+	//lpPackageQueue->PushVideoPackage(m_lpYUVBuffer, nYUVSize);
+	if (lpBufferInstance)
+		lpBufferInstance->pushYUVBuffer(0, m_lpYUVBuffer, nYUVSize, bmiHeader.biWidth, bmiHeader.biHeight);
 
 #ifdef DEBUG
 	hFile = ::CreateFile(_T("d:\\pictest\\trans.i420"), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);

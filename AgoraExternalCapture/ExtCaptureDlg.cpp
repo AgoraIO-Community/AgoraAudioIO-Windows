@@ -5,6 +5,7 @@
 #include "AgoraExternalCapture.h"
 #include "ExtCaptureDlg.h"
 #include "afxdialogex.h"
+#include "CBufferMgr.h"
 
 
 // CExtCaptureDlg ¶Ô»°¿ò
@@ -17,6 +18,8 @@ CExtCaptureDlg::CExtCaptureDlg(CWnd* pParent /*=NULL*/)
 	m_hExitPlayEvent = ::CreateEvent(NULL, NULL, FALSE, NULL);
 
 	m_hExitPushAudioEvent = ::CreateEvent(NULL, NULL, FALSE, NULL);
+
+	m_hExitPushVideoEvent = ::CreateEvent(NULL, NULL, FALSE, NULL);
 }
 
 CExtCaptureDlg::~CExtCaptureDlg()
@@ -24,6 +27,8 @@ CExtCaptureDlg::~CExtCaptureDlg()
 	::CloseHandle(m_hExitPlayEvent);
 
 	::CloseHandle(m_hExitPushAudioEvent);
+
+	::CloseHandle(m_hExitPushVideoEvent);
 }
 
 void CExtCaptureDlg::DoDataExchange(CDataExchange* pDX)
@@ -461,6 +466,7 @@ BOOL CExtCaptureDlg::VideoCaptureControl(BOOL bStart)
 	else {
 		CAgoraObject::GetAgoraObject()->EnableExtendVideoCapture(FALSE, NULL);
 		return m_agVideoCaptureDevice.CaptureControl(DEVICE_STOP);
+		::SetEvent(m_hExitPushVideoEvent);
 	}
 }
 
@@ -569,7 +575,7 @@ UINT CExtCaptureDlg::PushAudioDataThread(LPVOID lParam)
 
 		nAudioBufferSize = 8192;
 
-		if (!lpBufferQueue->PopAudioPackage(lpAudioData, &nAudioBufferSize))
+		if (false && !lpBufferQueue->PopAudioPackage(lpAudioData, &nAudioBufferSize))
 			continue;
 
 		frame.buffer = lpAudioData;
@@ -588,6 +594,8 @@ UINT CExtCaptureDlg::PushVideoDataThread(LPVOID lParam)
 	LPPUSHVIDEODATA_THREAD_PARAM lpParam = reinterpret_cast<LPPUSHVIDEODATA_THREAD_PARAM>(lParam);
 	CAgoraObject* lpAgoraObject = CAgoraObject::GetAgoraObject();
 	LPBYTE lpVideoData = new BYTE[0x800000];
+
+	CBufferMgr *lpBufferMgr = CBufferMgr::getInstance();
 
 	IVideoFrameObserver::VideoFrame frame;
 	int nWidth = lpParam->nWidth;
@@ -610,9 +618,11 @@ UINT CExtCaptureDlg::PushVideoDataThread(LPVOID lParam)
 		if (::WaitForSingleObject(lpParam->hExitEvent, 0) == WAIT_OBJECT_0)
 			break;
 
-		SIZE_T nVideoDataLen = nWidth *nHeight * 3 / 2;
-		BOOL bSuccess = CVideoPackageQueue::GetInstance()->PopVideoPackage(lpVideoData, &nVideoDataLen);
-		if (!bSuccess)
+		int nVideoDataLen = nWidth *nHeight * 3 / 2;
+// 		BOOL bSuccess = CVideoPackageQueue::GetInstance()->PopVideoPackage(lpVideoData, &nVideoDataLen);
+// 		if (!bSuccess)
+// 			continue;
+		if (!lpBufferMgr->popYUVBuffer(0,lpVideoData,nVideoDataLen,nWidth,nHeight))
 			continue;
 
 		frame.yBuffer = lpVideoData;

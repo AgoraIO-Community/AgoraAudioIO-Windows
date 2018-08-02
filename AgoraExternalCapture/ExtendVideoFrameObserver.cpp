@@ -6,12 +6,14 @@
 CExtendVideoFrameObserver::CExtendVideoFrameObserver()
 {
 	m_lpImageBuffer = new BYTE[0x800000];
+	m_lpImageBufferRemote = new BYTE[0x800000];
 }
 
 
 CExtendVideoFrameObserver::~CExtendVideoFrameObserver()
 {
 	delete[] m_lpImageBuffer;
+	delete[] m_lpImageBufferRemote;
 }
 
 bool CExtendVideoFrameObserver::onCaptureVideoFrame(VideoFrame& videoFrame)
@@ -52,5 +54,12 @@ bool CExtendVideoFrameObserver::onCaptureVideoFrame(VideoFrame& videoFrame)
 
 bool CExtendVideoFrameObserver::onRenderVideoFrame(unsigned int uid, VideoFrame& videoFrame)
 {
+	int nWidth = videoFrame.width;
+	int nHeight = videoFrame.height;
+	int nYStride = videoFrame.yStride;
+	int nUStride = videoFrame.uStride;
+	int nVStride = videoFrame.vStride;
+
+
 	return true;
 }

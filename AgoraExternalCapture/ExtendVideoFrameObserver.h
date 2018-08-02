@@ -14,6 +14,7 @@ public:
 
 private:
 	LPBYTE				m_lpImageBuffer;
+	LPBYTE				m_lpImageBufferRemote;
 	LPBYTE				m_lpY;
 	LPBYTE				m_lpU;
 	LPBYTE				m_lpV;

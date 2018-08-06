@@ -315,6 +315,7 @@ LRESULT CAgoraExternalCaptureDlg::OnJoinChannel(WPARAM wParam, LPARAM lParam)
 	m_dlgVideo.MoveWindow(0, 0, 960, 720, 1);
 	m_dlgVideo.ShowWindow(SW_SHOW);
 	m_dlgVideo.CenterWindow();
+	m_dlgVideo.RenderGDI();
 
 	VideoCanvas vc;
 

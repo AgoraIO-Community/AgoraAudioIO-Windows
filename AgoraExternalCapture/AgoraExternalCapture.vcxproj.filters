@@ -17,9 +17,6 @@
     <Filter Include="UI\Language">
       <UniqueIdentifier>{f8fa6769-043b-462c-8c2f-587906eee318}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\Ctrl">
-      <UniqueIdentifier>{0f1c5e51-801f-4f53-a0af-3cec416b9702}</UniqueIdentifier>
-    </Filter>
     <Filter Include="UI\Dialog">
       <UniqueIdentifier>{2c600536-0ba8-4ae7-af61-78ffa247aed6}</UniqueIdentifier>
     </Filter>
@@ -50,6 +47,9 @@
     <Filter Include="ExtCapture\YUVTrans">
       <UniqueIdentifier>{2fcdda08-02e2-41b1-a35e-c948857744f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\Dialog\Ctrl">
+      <UniqueIdentifier>{0f1c5e51-801f-4f53-a0af-3cec416b9702}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -68,13 +68,13 @@
       <Filter>UI\Language</Filter>
     </ClInclude>
     <ClInclude Include="AGButton.h">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClInclude>
     <ClInclude Include="AGHyperLink.h">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClInclude>
     <ClInclude Include="AGEdit.h">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClInclude>
     <ClInclude Include="EnterChannelDlg.h">
       <Filter>UI\Dialog</Filter>
@@ -89,10 +89,10 @@
       <Filter>UI\Dialog</Filter>
     </ClInclude>
     <ClInclude Include="AGSliderCtrl.h">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClInclude>
     <ClInclude Include="AGComboBox.h">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClInclude>
     <ClInclude Include="VideoDlg.h">
       <Filter>UI\Dialog</Filter>
@@ -131,7 +131,7 @@
       <Filter>UI\Dialog</Filter>
     </ClInclude>
     <ClInclude Include="AGLinkCtrl.h">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClInclude>
     <ClInclude Include="ChatDlg.h">
       <Filter>UI\Dialog</Filter>
@@ -214,13 +214,13 @@
       <Filter>UI\Language</Filter>
     </ClCompile>
     <ClCompile Include="AGButton.cpp">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClCompile>
     <ClCompile Include="AGHyperLink.cpp">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClCompile>
     <ClCompile Include="AGEdit.cpp">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClCompile>
     <ClCompile Include="EnterChannelDlg.cpp">
       <Filter>UI\Dialog</Filter>
@@ -232,10 +232,10 @@
       <Filter>UI\Dialog</Filter>
     </ClCompile>
     <ClCompile Include="AGSliderCtrl.cpp">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClCompile>
     <ClCompile Include="AGComboBox.cpp">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClCompile>
     <ClCompile Include="VideoDlg.cpp">
       <Filter>UI\Dialog</Filter>
@@ -274,7 +274,7 @@
       <Filter>UI\Dialog</Filter>
     </ClCompile>
     <ClCompile Include="AGLinkCtrl.cpp">
-      <Filter>UI\Ctrl</Filter>
+      <Filter>UI\Dialog\Ctrl</Filter>
     </ClCompile>
     <ClCompile Include="ChatDlg.cpp">
       <Filter>UI\Dialog</Filter>

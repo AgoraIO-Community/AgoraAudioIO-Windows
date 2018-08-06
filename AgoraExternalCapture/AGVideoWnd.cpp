@@ -267,11 +267,15 @@ int CAGVideoWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndInfo.Create(NULL, NULL, WS_CHILD | WS_VISIBLE, CRect(0, 0, 192, 28), this, IDC_STATIC);
 	
 	m_renderVideoThreadParam.hExitEvent = m_hRenderGDIEvent;
-	AfxBeginThread(RenderThreadGDI, this);
 
 	return 0;
 }
 
+void CAGVideoWnd::StartGDIRendr(BOOL bFlage /*= FALSE*/)
+{
+	if (bFlage)
+		AfxBeginThread(RenderThreadGDI, this);
+}
 
 void CAGVideoWnd::ShowVideoInfo(BOOL bShow)
 {
@@ -374,6 +378,7 @@ UINT CAGVideoWnd::RenderThreadGDI(LPVOID lParam)
 	LPBYTE lpVideoImage24 = nullptr;
 
 	do{
+		Sleep(10);
 		if (pVideoWnd->m_nUID == 0 || 0 == pVideoWnd->m_nWidth || 0 == pVideoWnd->m_nHeight)
 			continue;
 		else if ( nullptr == lpVideoImage24)

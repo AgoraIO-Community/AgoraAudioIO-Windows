@@ -71,6 +71,8 @@ public:
 	void SetBigShowFlag(BOOL bBigShow);
 	BOOL IsBigShow() { return m_bBigShow; };
 
+	void StartGDIRendr(BOOL bFlage = FALSE);
+
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);

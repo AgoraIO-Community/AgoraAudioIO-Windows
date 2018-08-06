@@ -38,6 +38,8 @@ public:
 
 	void ShowControlButton(BOOL bShow = TRUE);
 
+	void RenderGDI();
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 	virtual BOOL OnInitDialog();

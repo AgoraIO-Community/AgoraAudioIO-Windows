@@ -503,6 +503,12 @@ void CVideoDlg::ShowControlButton(BOOL bShow)
 	m_btnEndCall.ShowWindow(nShowMode);
 }
 
+void CVideoDlg::RenderGDI()
+{
+	for (int nIndex = 0; nIndex < 4; nIndex++)
+		m_wndVideo[nIndex].StartGDIRendr(isRenderSelf);
+}
+
 void CVideoDlg::OnBnClickedBtntip()
 {
 	for (int nIndex = 0; nIndex < 4; nIndex++)

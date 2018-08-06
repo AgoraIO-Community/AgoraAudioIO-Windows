@@ -396,12 +396,6 @@ UINT CAGVideoWnd::RenderThreadGDI(LPVOID lParam)
 		//Change to Little Endian
 		CHANGE_ENDIAN_PIC(lpVideoImage24, nWidth, nHeight, 24);
 
-		FILE *pFile1 = fopen("../rgb24.h264", "ab+");
-		if (pFile1) {
-			fwrite(lpVideoImage24, 1, nRGB24Len, pFile1);
-			fclose(pFile1);
-		}
-
 		BITMAPINFO m_bmphdr={0};
 		DWORD dwBmpHdr = sizeof(BITMAPINFO);
 		//24bit
@@ -460,7 +454,6 @@ UINT CAGVideoWnd::RenderThreadGDI(LPVOID lParam)
 			}
 		}
 
-
 		int nResult = StretchDIBits(hdc,
 			nDcX,nDcY,
 			nDcWdith,nDcHeight,
@@ -472,8 +465,7 @@ UINT CAGVideoWnd::RenderThreadGDI(LPVOID lParam)
 			SRCCOPY);
 
 		::ReleaseDC(wnd, hdc);
-
-		
+	
 #if 0
 		FILE *pFile = fopen("../video.yuv", "ab+");
 		if (pFile) {

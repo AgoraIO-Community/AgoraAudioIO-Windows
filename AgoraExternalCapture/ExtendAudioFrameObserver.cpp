@@ -43,7 +43,6 @@ bool CExtendAudioFrameObserver::onPlaybackAudioFrame(AudioFrame& audioFrame)
 		pFileRecord = nullptr;
 	}
 
-	
 	return true;
 }
 

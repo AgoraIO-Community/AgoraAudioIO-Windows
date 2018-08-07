@@ -619,6 +619,7 @@ UINT CExtCaptureDlg::PushVideoDataThread(LPVOID lParam)
 	frame.rotation = 0;
 
 	do {
+		Sleep(10);
 		if (::WaitForSingleObject(lpParam->hExitEvent, 0) == WAIT_OBJECT_0)
 			break;
 

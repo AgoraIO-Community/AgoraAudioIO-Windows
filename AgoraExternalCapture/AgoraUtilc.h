@@ -591,6 +591,17 @@ namespace AgoraSdkCWrapperUtilc
 			}
 	}
 
+	static UINT64 WINAPI GetHighAccuracyTickCount()
+	{
+		LARGE_INTEGER	liPC;
+		LARGE_INTEGER	liPF;
+
+		::QueryPerformanceCounter(&liPC);
+		::QueryPerformanceFrequency(&liPF);
+
+		return static_cast<UINT64>(liPC.QuadPart * 1000 / liPF.QuadPart);
+	}
+
 }
 
 

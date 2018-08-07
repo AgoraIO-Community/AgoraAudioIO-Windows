@@ -614,7 +614,7 @@ UINT CExtCaptureDlg::PushVideoDataThread(LPVOID lParam)
 	frame.uStride = nUStride;
 	frame.vStride = nVStride;
 
-	frame.renderTimeMs = ::GetTickCount64();
+	frame.renderTimeMs = /*::GetTickCount64()*/GetHighAccuracyTickCount();
 	frame.type = IVideoFrameObserver::FRAME_TYPE_YUV420;
 	frame.rotation = 0;
 

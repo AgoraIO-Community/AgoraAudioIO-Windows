@@ -631,7 +631,7 @@ UINT CExtCaptureDlg::PushVideoDataThread(LPVOID lParam)
 		frame.uBuffer = lpVideoData + nYStride * nHeight;
 		frame.vBuffer = lpVideoData + nYStride * nHeight + nUStride * nHeight / 2;
 
-#if 0
+#if 1
 		FILE *pFile = fopen("../video.yuv", "ab+");
 		if (pFile) {
 			fwrite(frame.yBuffer, 1, nYStride * nHeight, pFile);

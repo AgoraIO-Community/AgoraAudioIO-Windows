@@ -15,13 +15,12 @@ CExtendAudioFrameObserver::~CExtendAudioFrameObserver()
 bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 {
 	SIZE_T nSize = audioFrame.channels*audioFrame.samples * 2;
-	CAudioCapturePackageQueue::GetInstance()->PopAudioPackage(audioFrame.buffer, &nSize);
+	CAudioCapturePackageQueue::GetInstance()->PushAudioPackage(audioFrame.buffer, nSize);
 
-	FILE* pFileRecord = fopen("..\\Extendaudio.txt","ab+");
+	FILE* pFileRecord = fopen("..\\Extendaudio.pcm","ab+");
 	if (pFileRecord) {
 
-		std::string str = __FUNCTION__ + std::string("\n");
-		fwrite(str.data(), 1, str.length(), pFileRecord);
+		fwrite(audioFrame.buffer, 1, nSize, pFileRecord);
 		fclose(pFileRecord);
 		pFileRecord = nullptr;
 	}
@@ -32,16 +31,16 @@ bool CExtendAudioFrameObserver::onRecordAudioFrame(AudioFrame& audioFrame)
 bool CExtendAudioFrameObserver::onPlaybackAudioFrame(AudioFrame& audioFrame)
 {
 	SIZE_T nSize = audioFrame.channels*audioFrame.samples * 2;
-	CAudioPlayPackageQueue::GetInstance()->PushAudioPackage(audioFrame.buffer, nSize);
+	bool res = CAudioCapturePackageQueue::GetInstance()->PopAudioPackage(audioFrame.buffer, &nSize);
 
-	FILE* pFileRecord = fopen("..\\Extendaudio.txt", "ab+");
-	if (pFileRecord) {
-
-		std::string str = __FUNCTION__ + std::string("\n");
-		fwrite(str.data(), 1, str.length(), pFileRecord);
+	FILE* pFileRecord = fopen("..\\Extendaudio1.pcm", "ab+");
+	if (pFileRecord && res) {
+		fwrite(audioFrame.buffer, 1, nSize, pFileRecord);
 		fclose(pFileRecord);
 		pFileRecord = nullptr;
 	}
+
+
 
 	return true;
 }

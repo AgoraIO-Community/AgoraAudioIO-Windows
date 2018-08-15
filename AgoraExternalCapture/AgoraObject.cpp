@@ -558,7 +558,8 @@ BOOL CAgoraObject::SetVideoProfileEx(int nWidth, int nHeight, int nFrameRate, in
 BOOL CAgoraObject::SetAudioProfileEx(int nSampleRate, int nChannels, int nSamplesPerCall)
 {
 	AParameter apm(*m_lpAgoraEngine);
-	apm->setParameters(R"(["che.audio.external_device":true])");
+	if (!isEarReturn)
+		apm->setParameters(R"(["che.audio.external_device":true])");
 
 	RtcEngineParameters rep(*m_lpAgoraEngine);
 
@@ -636,6 +637,18 @@ BOOL CAgoraObject::EnableSDKVideoCapture(BOOL bEnable)
 		apm->setParameters("{\"che.video.local.camera_index\":0}");
 
 	return nRet == 0 ? TRUE : FALSE;
+}
+
+BOOL CAgoraObject::EnableSDKAudioCapture(BOOL bEnable)
+{
+	int nRet = 0;
+	AParameter apm(*m_lpAgoraEngine);
+	if (bEnable)
+		nRet = apm->setParameters(R"(["che.audio.external_device":false])");
+	else 
+		nRet = apm->setParameters(R"(["che.audio.external_device":true])");
+
+	return nRet == 0 ? TRUE:FALSE;
 }
 
 BOOL CAgoraObject::PushVideoFrame(agora::media::IVideoFrameObserver::VideoFrame *videoFrame)

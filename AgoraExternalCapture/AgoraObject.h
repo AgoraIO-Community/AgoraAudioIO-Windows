@@ -93,7 +93,7 @@ public:
 
 	BOOL MuteAllRemoteVideo(BOOL bMuted = TRUE);
 	BOOL IsAllRemoteVideoMuted();
-
+	
 	BOOL EnableLoopBack(BOOL bEnable = TRUE);
 	BOOL IsLoopBackEnabled();
 
@@ -122,6 +122,7 @@ public:
 	BOOL EnableExtendAudioCapture(BOOL bEnable, IAudioFrameObserver* lpAudioFrameObserver);
 	BOOL EnableExtendVideoCapture(BOOL bEnable, IVideoFrameObserver* lpVideoFrameObserver);
 	BOOL EnableSDKVideoCapture(BOOL bEnable);
+	BOOL EnableSDKAudioCapture(BOOL bEnable);
 
 	BOOL PushVideoFrame(agora::media::IVideoFrameObserver::VideoFrame *videoFrame);
 

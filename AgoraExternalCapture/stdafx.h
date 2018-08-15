@@ -47,6 +47,7 @@
 using namespace agora::util;
 
 extern bool isRenderSelf;
+extern bool isEarReturn;
 
 #pragma comment(lib,"../SDK/lib/agora_rtc_sdk.lib")
 

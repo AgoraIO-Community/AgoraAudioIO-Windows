@@ -36,7 +36,7 @@ CAgoraExternalCaptureApp::CAgoraExternalCaptureApp()
 
 CAgoraExternalCaptureApp theApp;
 bool isRenderSelf = false;
-
+bool isEarReturn = false;
 
 // CAgoraVideoCallApp initialization
 

@@ -69,6 +69,7 @@ public:
 
 	BOOL IsExtVideoCapEnabled() const { return m_ckExtVideoCapture.GetCheck(); };
 	BOOL IsExtAudioCapEnabled() const { return m_ckExtAudioCapture.GetCheck(); };
+	BOOL IsExtEarReturn() const { return m_ckExtEarReturn.GetCheck(); };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
@@ -113,6 +114,7 @@ private:
 	CButton			m_ckExtAudioCapture;
 	CButton			m_ckExtPushAudio;
 	CButton        m_ckExtPushVideo;
+	CButton        m_ckExtEarReturn;
 
 	CFont			m_ftDes;
 	CFont			m_ftHead;

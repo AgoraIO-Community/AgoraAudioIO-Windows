@@ -43,6 +43,7 @@ void CExtCaptureDlg::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_CKAUDIOPUSH_EXTCAP, m_ckExtPushAudio);
 	DDX_Control(pDX, IDC_CKVIDEOPUSH_EXCAPTURE, m_ckExtPushVideo);
+	DDX_Control(pDX, IDC_CHECK_EARRETURN, m_ckExtEarReturn);
 }
 
 
@@ -137,6 +138,7 @@ void CExtCaptureDlg::InitCtrls()
 
 	m_ckExtAudioCapture.MoveWindow(100, 295, 200, 24);
 	m_ckExtPushAudio.MoveWindow(100, 327, 200, 24);
+	m_ckExtEarReturn.MoveWindow(300, 295, 100, 24);
 
 	m_btnCancel.MoveWindow(46, 350, 120, 36, TRUE);
 	m_btnCancel.EnableRoundCorner(TRUE);
@@ -228,6 +230,20 @@ void CExtCaptureDlg::OnBnClickedBtnconfirmExtcap()
 			lpAgoraObject->EnableExtendAudioCapture(TRUE, &m_exCapAudioFrameObserver);
 	}
 
+	if (m_ckExtEarReturn.GetCheck()) {
+
+		isEarReturn = true;
+		m_agAudioCaptureDevice.SelectMediaCap(nMicCapSel);
+		m_agAudioCaptureDevice.GetCurrentAudioCap(&waveFormat);
+		nBufferSize = waveFormat.nAvgBytesPerSec / 100;
+		CAudioCapturePackageQueue::GetInstance()->SetAudioFormat(&waveFormat);
+		CAudioCapturePackageQueue::GetInstance()->SetAudioPackageSize(nBufferSize);
+		lpAgoraObject->SetAudioProfileEx(waveFormat.nSamplesPerSec, waveFormat.nChannels, waveFormat.nSamplesPerSec*waveFormat.nChannels / 100);
+
+		if (!m_ckExtPushAudio.GetCheck())
+			lpAgoraObject->EnableExtendAudioCapture(TRUE, &m_exCapAudioFrameObserver);
+	}
+
 	CDialogEx::OnOK();
 }
 
@@ -287,6 +303,19 @@ void CExtCaptureDlg::OnBnClickedBtnapplyExtcap()
 			lpAgoraObject->EnableExtendAudioCapture(TRUE, &m_exCapAudioFrameObserver);
 	}
 
+	if (m_ckExtEarReturn.GetCheck()) {
+
+		isEarReturn = true;
+		m_agAudioCaptureDevice.SelectMediaCap(nMicCapSel);
+		m_agAudioCaptureDevice.GetCurrentAudioCap(&waveFormat);
+		nBufferSize = waveFormat.nAvgBytesPerSec / 100;
+		CAudioCapturePackageQueue::GetInstance()->SetAudioFormat(&waveFormat);
+		CAudioCapturePackageQueue::GetInstance()->SetAudioPackageSize(nBufferSize);
+		lpAgoraObject->SetAudioProfileEx(waveFormat.nSamplesPerSec, waveFormat.nChannels, waveFormat.nSamplesPerSec*waveFormat.nChannels / 100);
+		
+		if (!m_ckExtPushAudio.GetCheck())
+			lpAgoraObject->EnableExtendAudioCapture(TRUE, &m_exCapAudioFrameObserver);
+	}
 }
 
 void CExtCaptureDlg::OnCmbselCameraDevice()

@@ -1,1 +1,3 @@
-audioIn demo branch 2.2.0主要是适配 2.2.0.35 SDK，验证音视频自采集接口的准确性和完整性.
+audioIn demo branch EarReturn主要是验证window端耳返功能，测试该demo需要带上耳机. 
+
+需要的.h文件需要下载的地址：https://pan.baidu.com/s/1laynZYkk6pmhN5PbymPhhA
